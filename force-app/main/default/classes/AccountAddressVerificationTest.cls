@@ -1,7 +1,7 @@
 @isTest
-private class AccountAddressVerificationTest {
-    
-    // Utility method to create a test Account with a specified postal code
+public class AccountAddressVerificationTest {
+
+    // Helper method to create test accounts
     private static Account createTestAccount(String postalCode) {
         return new Account(Name = 'Test Account', BillingPostalCode = postalCode);
     }
@@ -12,59 +12,59 @@ private class AccountAddressVerificationTest {
         Test.startTest();
         insert acc;
         Test.stopTest();
-        Account result = [SELECT BillingPostalCode FROM Account WHERE Id = :acc.Id];
-        System.assert(result.BillingPostalCode == '123456', 'The Billing Postal Code should be valid for Romanian format.');
+        
+        // Verify no errors were added
+        System.assertEquals(0, acc.getErrors().size(), 'There should be no errors for a valid Romanian postal code.');
     }
-    
+
     @isTest
     static void testValidBrazilianPostalCodeWithHyphen() {
         Account acc = createTestAccount('12345-678');
-        Account accWithHyphen = new Account(Name = 'Test Account BR With Hyphen', BillingPostalCode = '12345-678');
         Test.startTest();
-        insert accWithHyphen;
+        insert acc;
         Test.stopTest();
-        Account resultWithHyphen = [SELECT BillingPostalCode FROM Account WHERE Id = :accWithHyphen.Id];
-        System.assert(resultWithHyphen.BillingPostalCode == '12345-678', 'The Billing Postal Code should be valid with a hyphen for Brazilian format.');
+        
+        // Verify no errors were added
+        System.assertEquals(0, acc.getErrors().size(), 'There should be no errors for a valid Brazilian postal code with hyphen.');
     }
-    
+
     @isTest
     static void testValidBrazilianPostalCodeWithoutHyphen() {
         Account acc = createTestAccount('12345678');
         Test.startTest();
         insert acc;
         Test.stopTest();
-        Account resultWithoutHyphen = [SELECT BillingPostalCode FROM Account WHERE Id = :acc.Id];
-        System.assert(resultWithoutHyphen.BillingPostalCode == '12345678', 'The Billing Postal Code should be valid without a hyphen for Brazilian format.');
+        
+        // Verify no errors were added
+        System.assertEquals(0, acc.getErrors().size(), 'There should be no errors for a valid Brazilian postal code without hyphen.');
     }
-    
+
     @isTest
     static void testInvalidPostalCode() {
-        Account acc = createTestAccount('ABCDE');
-        Boolean errorThrown = false;
+        Account acc = createTestAccount('ABC123');
         try {
             Test.startTest();
             insert acc;
+            System.assert(false, 'Expected an exception due to invalid postal code.');
             Test.stopTest();
         } catch (DmlException e) {
-            errorThrown = true;
-            String expectedError = 'The Billing Postal Code is invalid';
-            System.assert(e.getMessage().contains(expectedError), 'Expected error message to contain: ' + expectedError);
+            // Verify that the error message is as expected
+            System.assert(e.getMessage().contains('The Billing Postal Code is not in the correct format.'));
         }
-        System.assert(errorThrown, 'An error should have been thrown for the invalid postal code.');
     }
 
     @isTest
     static void testNullPostalCode() {
         Account acc = createTestAccount(null);
-        Exception caughtException = null;
-        Test.startTest();
         try {
+            Test.startTest();
             insert acc;
+            System.assert(false, 'Expected an exception due to null postal code.');
+            Test.stopTest();
         } catch (DmlException e) {
-            caughtException = e;
+            // Verify that the error message is as expected
+            System.assert(e.getMessage().contains('The Billing Postal Code is not in the correct format.'));
         }
-        Test.stopTest();
-        System.assertNotEquals(null, caughtException, 'An exception should have been thrown for the null postal code.');
-        System.assert(caughtException.getMessage().contains('The Billing Postal Code is invalid'), 'The error message should indicate the null postal code.');
+        
     }
 }
