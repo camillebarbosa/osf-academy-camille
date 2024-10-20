@@ -1,18 +1,29 @@
-# Salesforce DX Project: Next Steps
+# Pre-Requisites
 
-Now that you’ve created a Salesforce DX project, what’s next? Here are some documentation resources to get you started.
+# Scenario
+A company wants to ensure that discounts are automatically applied to Opportunities based on their sales stage. This helps in maintaining consistent pricing strategies throughout the sales process. The discount rates vary depending on the stage of the Opportunity.
 
-## How Do You Plan to Deploy Your Changes?
+# Requirements
+- Create a trigger on the Opportunity object.
+- The trigger should fire before the insert event.
+- Apply discounts based on the Opportunity's stage:
+    - Prospecting: 5% discount
+    - Qualification: 10% discount
+    - Negotiation/Review: 15% discount
+    - Other Stages: No discount
+- Implement the discount logic in a separate Apex class for better maintainability.
 
-Do you want to deploy a set of changes, or create a self-contained application? Choose a [development model](https://developer.salesforce.com/tools/vscode/en/user-guide/development-models).
+# Instructions
+- **Create an Apex Class**:
+    - Name it OpportunityDiscountAssigner.
+    - Implement a method to apply discounts based on the Opportunity stage.
 
-## Configure Your Salesforce DX Project
+- **Create an Apex Trigger**:
+    - Name it OpportunityTrigger.
+    - The trigger should invoke the discount logic from the OpportunityDiscountAssigner class before inserting an Opportunity.
 
-The `sfdx-project.json` file contains useful configuration information for your project. See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm) in the _Salesforce DX Developer Guide_ for details about this file.
+- **Testing**:
+    - Use the provided test class OpportunityDiscountAssignerTest to ensure all scenarios are covered.
+    - Achieve a minimum test coverage of 100% by running all tests using the Salesforce Developer Console or Visual Studio Code.
 
-## Read All About It
-
-- [Salesforce Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
-- [Salesforce CLI Setup Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_intro.htm)
-- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm)
+By following these instructions, you will ensure that the Opportunity records in your Salesforce Org are automatically adjusted with the correct discounts based on their sales stage, maintaining consistency and accuracy in pricing strategies.
