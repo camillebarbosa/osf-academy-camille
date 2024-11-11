@@ -1,4 +1,3 @@
-LeadManagerTest.cls
 @isTest
 private class LeadManagerTest {
 
