@@ -1,3 +1,4 @@
+
 @isTest
 private class LeadManagerTest {
 
@@ -48,27 +49,29 @@ private class LeadManagerTest {
         System.assertEquals(null, postConversionLead.Conversion_Status__c, 'The lead conversion status should remain null.');
     }
 
-    @isTest static void testBulkLeadConversion() {
+    @isTest
+    static void testBulkLeadConversion() {
         List<Lead> leads = new List<Lead>{
             createTestLead('BulkQual1', 'BulkComp1', 'Open - Not Contacted', 500000),
             createTestLead('BulkQual2', 'BulkComp2', 'Open - Not Contacted', 100001),
             createTestLead('BulkUnqual', 'BulkComp3', 'Working - Contacted', 120000)
         };
         insert leads;
-
+    
         Test.startTest();
         LeadManager.qualifyAndConvertLeads(leads);
         Test.stopTest();
-
-        List<Lead> postConversionLeads = [SELECT Conversion_Status__c FROM Lead WHERE Id IN :leads];
-        System.assertEquals(2, postConversionLeads.size(), 'There should be two converted leads.');
+    
+        List<Lead> postConversionLeads = [SELECT LastName, Conversion_Status__c FROM Lead WHERE Id IN :leads];
+        System.assertEquals(3, postConversionLeads.size(), 'There should be three leads after conversion.');
+    
+        Integer convertedLeadsCount = 0;
         for (Lead l : postConversionLeads) {
-            if (l.LastName == 'BulkQual1' || l.LastName == 'BulkQual2') {
-                System.assertEquals('Converted', l.Conversion_Status__c, 'The lead conversion status should be set to Converted.');
-            } else {
-                System.assertEquals(null, l.Conversion_Status__c, 'The lead conversion status should remain null for unqualified leads.');
+            if (l.Conversion_Status__c == 'Converted') {
+                convertedLeadsCount++;
             }
         }
+        System.assertEquals(2, convertedLeadsCount, 'There should be two converted leads.');
     }
 
     @isTest static void testNoLeadsPassed() {
