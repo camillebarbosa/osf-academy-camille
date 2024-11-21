@@ -1,8 +1,5 @@
 # SFDC Exercise
 
-# Pre-Requisites
-Create an empty SFDX project on Visual Studio Code and make sure you are connected to a trailhead playground
-
 # Scenario
 A company wants to ensure that whenever an Account record is created or updated, the billing address is verified against an external address verification service. For the purpose of this exercise, we will simulate the verification by checking if the Billing Postal Code is in either one of 2 specific country formats: Romanian or Brazilian
 
