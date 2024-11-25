@@ -1,17 +1,13 @@
-import { createElement } from 'lwc';
-import WeatherApp from 'c/weatherApp';
-import getWeatherForCity from '@salesforce/apex/WeatherService.getWeatherForCity';
+// Import necessary modules and utilities
+import { createElement } from "lwc";
+import AccountWeather from "c/accountWeather";
+import getWeatherData from "@salesforce/apex/WeatherService.getWeatherData";
+import { getRecord } from "lightning/uiRecordApi";
+import { registerTestWireAdapter } from "@salesforce/wire-service-jest-util";
 
-function flushPromises() {
-    // eslint-disable-next-line @lwc/lwc/no-async-operation
-    return new Promise((resolve) => setTimeout(resolve, 0));
-}
-
-
-
-// Mocking the getWeatherForCity Apex call
+// Mocking the Apex method
 jest.mock(
-  '@salesforce/apex/WeatherService.getWeatherForCity',
+  "@salesforce/apex/WeatherService.getWeatherData",
   () => {
     return {
       default: jest.fn()
@@ -20,84 +16,211 @@ jest.mock(
   { virtual: true }
 );
 
-describe('c-weather-app', () => {
-    afterEach(() => {
-        while (document.body.firstChild) {
-            document.body.removeChild(document.body.firstChild);
-        }
-        // Clearing any mock calls
-        jest.clearAllMocks();
+// Register the wire adapter
+const getRecordAdapter = registerTestWireAdapter(getRecord);
+
+// Utility function to wait for all promises to resolve
+function flushPromises() {
+  return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
+describe("c-account-weather", () => {
+  afterEach(() => {
+    // Clean up the DOM after each test case
+    while (document.body.firstChild) {
+      document.body.removeChild(document.body.firstChild);
+    }
+    // Clear any mock calls
+    jest.clearAllMocks();
+  });
+
+  it("displays weather data correctly when Apex call is successful", async () => {
+    // Mock the Apex call to return weather data
+    getWeatherData.mockResolvedValue({
+      main: { temp: 288.55 },
+      weather: [{ description: "clear sky", icon: "01d" }]
     });
 
-    it('gets weather data correctly', async () => {
-        // Arrange
-        const ELEMENT = createElement('c-weather-app', {
-            is: WeatherApp
-        });
-        document.body.appendChild(ELEMENT);
-    
-        // Mock the Apex method response
-        getWeatherForCity.mockResolvedValue({
-            Temperature__c: 285,
-            Description__c: 'Partly cloudy',
-            Wind_Speed__c: 5
-        });
-    
-        // Act - simulate entering the city name and clicking the button
-        const inputElement = ELEMENT.shadowRoot.querySelector('lightning-input');
-        inputElement.value = 'San Francisco';
-        inputElement.dispatchEvent(new CustomEvent('change'));
-    
-        const buttonElement = ELEMENT.shadowRoot.querySelector('lightning-button');
-        buttonElement.click();
-    
-        // Flush any pending promises (wait for them to resolve)
-        await flushPromises();
-    
-        // Re-query the DOM for rendered elements after promises have resolved
-        const temperatureElement = ELEMENT.shadowRoot.querySelector('p:nth-of-type(1)');
-        const descriptionElement = ELEMENT.shadowRoot.querySelector('p:nth-of-type(2)');
-        const windSpeedElement = ELEMENT.shadowRoot.querySelector('p:nth-of-type(3)');
-    
-        // Assert - check if the values are displayed correctly
-        expect(temperatureElement.textContent).toContain('285 K');
-        expect(descriptionElement.textContent).toContain('Partly cloudy');
-        expect(windSpeedElement.textContent).toContain('5 m/s');
+    // Create and attach the component to the DOM
+    const element = createElement("c-account-weather", {
+      is: AccountWeather
     });
-    
-    // Include the previously defined flushPromises function here
+    element.recordId = "0011700000pJRRSAA4"; // Mock recordId
+    document.body.appendChild(element);
 
-    it('shows error message when getWeatherForCity Apex call fails', async () => {
-        // Arrange
-        const ELEMENT = createElement('c-weather-app', {
-            is: WeatherApp
-        });
-        document.body.appendChild(ELEMENT);
+    // Emit data from the getRecord wire adapter
+    getRecordAdapter.emit({
+      fields: {
+        BillingCity: { value: "San Francisco" }
+      }
+    });
 
-        // Setup the mock function to reject the promise
-        getWeatherForCity.mockRejectedValue({
-            message: 'No data available', // Simulate error message property
-            body: {
-                message: 'No data available' // Mock might need different properties based on how your component handles errors
-            }
-        });
+    // Wait for all async operations to finish
+    await flushPromises();
 
-        // Act
-        const inputElement = ELEMENT.shadowRoot.querySelector('lightning-input');
-        inputElement.value = 'Invalid City';
-        inputElement.dispatchEvent(new CustomEvent('change'));
+    // Query all heading elements
+    const headingElements = element.shadowRoot.querySelectorAll(
+      "p.slds-text-heading_small"
+    );
 
-        ELEMENT.shadowRoot.querySelector('lightning-button').click();
+    // Initialize variables to hold the elements
+    let descriptionElement = null;
+    let temperatureElement = null;
 
-        // Flush any pending promises (wait for them to resolve)
-        await flushPromises();
+    // Iterate over heading elements to find the ones we need
+    headingElements.forEach((el) => {
+      if (el.textContent.includes("Description")) {
+        descriptionElement = el;
+      } else if (el.textContent.includes("Temperature")) {
+        temperatureElement = el;
+      }
+    });
 
-        // Query the DOM for the error element
-        const errorElement = ELEMENT.shadowRoot.querySelector('.slds-text-color_error');
+    // Assert that the elements are found and have correct content
+    expect(descriptionElement).not.toBeNull();
+    expect(descriptionElement.textContent).toContain("Description clear sky");
 
-        // Assert
-        console.log(JSON.stringify(errorElement.textContent))
-        expect(errorElement).not.toBeNull();
-        expect(errorElement.textContent).toContain('No data available');
-        });
+    expect(temperatureElement).not.toBeNull();
+    expect(temperatureElement.textContent).toContain("Temperature 288.55");
+
+    // Query for the icon element
+    const iconElement = element.shadowRoot.querySelector("img");
+
+    expect(iconElement).not.toBeNull();
+    expect(iconElement.src).toContain(
+      "https://openweathermap.org/img/wn/01d@2x.png"
+    );
+  });
+
+  it("shows error message when getWeatherData Apex call fails", async () => {
+    // Mock the Apex call to reject the promise
+    getWeatherData.mockRejectedValue({
+      body: { message: "City not found" }
+    });
+
+    // Create and attach the component to the DOM
+    const element = createElement("c-account-weather", {
+      is: AccountWeather
+    });
+    element.recordId = "0011700000pJRRSAA4"; // Mock recordId
+    document.body.appendChild(element);
+
+    // Emit data from the getRecord wire adapter
+    getRecordAdapter.emit({
+      fields: {
+        BillingCity: { value: "InvalidCity" }
+      }
+    });
+
+    // Wait for all async operations to finish
+    await flushPromises();
+
+    // Query the DOM for the error message
+    const errorElement = element.shadowRoot.querySelector(
+      ".slds-text-color_error"
+    );
+
+    // Assert that the error message is displayed correctly
+    expect(errorElement).not.toBeNull();
+    expect(errorElement.textContent).toContain(
+      "Failed to retrieve weather data: City not found"
+    );
+  });
+
+  it("displays account city retrieval error when getRecord fails", async () => {
+    // Create and attach the component to the DOM
+    const element = createElement("c-account-weather", {
+      is: AccountWeather
+    });
+    element.recordId = "0011700000pJRRSAA4"; // Mock recordId
+    document.body.appendChild(element);
+
+    // Simulate an error from the getRecord wire adapter
+    getRecordAdapter.error(new Error("Record retrieval error"));
+
+    // Wait for all async operations to finish
+    await flushPromises();
+
+    // Query the DOM for the error message
+    const errorElement = element.shadowRoot.querySelector(
+      ".slds-text-color_error"
+    );
+
+    // Assert that the error message is displayed correctly
+    expect(errorElement).not.toBeNull();
+    expect(errorElement.textContent).toContain(
+      "Failed to retrieve account city"
+    );
+  });
+});
+
+it("displays error message for invalid weather data structure", async () => {
+  // Mock the Apex call to return an invalid weather data structure
+  getWeatherData.mockResolvedValue({
+    main: undefined, // Invalid structure (missing main field)
+    weather: [] // Empty weather array
+  });
+
+  // Create and attach the component to the DOM
+  const element = createElement("c-account-weather", {
+    is: AccountWeather
+  });
+  element.recordId = "0011700000pJRRSAA4"; // Mock recordId
+  document.body.appendChild(element);
+
+  // Emit data from the getRecord wire adapter
+  getRecordAdapter.emit({
+    fields: {
+      BillingCity: { value: "San Francisco" }
+    }
+  });
+
+  // Wait for all async operations to finish
+  await flushPromises();
+
+  // Query the DOM for the error message
+  const errorElement = element.shadowRoot.querySelector(
+    ".slds-text-color_error"
+  );
+
+  // Assert that the error message is displayed correctly
+  expect(errorElement).not.toBeNull();
+  expect(errorElement.textContent).toContain(
+    "Invalid weather data structure returned by the API."
+  );
+});
+
+it("displays detailed error message when getWeatherData call fails with error.body", async () => {
+  // Mock the Apex call to reject the promise with an error object that has `body` and `body.message`
+  getWeatherData.mockRejectedValue({
+    body: { message: "Mocked error message from body" }
+  });
+
+  // Create and attach the component to the DOM
+  const element = createElement("c-account-weather", {
+    is: AccountWeather
+  });
+  element.recordId = "0011700000pJRRSAA4"; // Mock recordId
+  document.body.appendChild(element);
+
+  // Emit data from the getRecord wire adapter
+  getRecordAdapter.emit({
+    fields: {
+      BillingCity: { value: "San Francisco" }
+    }
+  });
+
+  // Wait for all async operations to finish
+  await flushPromises();
+
+  // Query the DOM for the error message
+  const errorElement = element.shadowRoot.querySelector(
+    ".slds-text-color_error"
+  );
+
+  // Assert that the error message is displayed correctly
+  expect(errorElement).not.toBeNull();
+  expect(errorElement.textContent).toBe(
+    "Failed to retrieve weather data: Mocked error message from body"
+  );
 });
