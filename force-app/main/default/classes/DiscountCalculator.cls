@@ -7,16 +7,31 @@
 **/
 public with sharing class DiscountCalculator {
 
-    public static Decimal calculateDiscount(Decimal amount) {
+    public static Decimal calculateDiscount(Decimal amount, String discountCode) {
 
         if (amount == null) {
-            return 0;
-        } 
-        else if (amount > 100) {
-            return amount * 0.9;
-        } 
-        else {
-            return amount;
+            return null;
         }
+
+        Decimal finalAmount = amount;
+
+        if (amount < 100) {
+            finalAmount = amount;
+        }
+        else if (amount >= 100 && amount <= 200) {
+            finalAmount = amount * 0.9;
+        }
+        else if (amount > 200 && amount < 500) {
+            finalAmount = amount * 0.85;
+        }
+        else if (amount >= 500) {
+            finalAmount = amount * 0.8;
+        }
+
+        if (discountCode == 'OSF5') {
+            finalAmount = finalAmount * 0.95;
+        }
+
+        return finalAmount;
     }
 }

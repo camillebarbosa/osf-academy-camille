@@ -10,16 +10,28 @@ private class DiscountCalculatorTest {
 
     @isTest static void testCalculateDiscount() {
 
-        // Test amount with no discount
-        Decimal noDiscountAmount = DiscountCalculator.calculateDiscount(50);
+        // No discount (<100)
+        Decimal noDiscountAmount = DiscountCalculator.calculateDiscount(50, null);
         System.assertEquals(50, noDiscountAmount);
 
-        // Test amount with discount
-        Decimal discountAmount = DiscountCalculator.calculateDiscount(200);
-        System.assertEquals(180, discountAmount);
+        // 10% discount (100–200)
+        Decimal discount10 = DiscountCalculator.calculateDiscount(200, null);
+        System.assertEquals(180, discount10);
 
-        // Test null amount
-        Decimal nullAmount = DiscountCalculator.calculateDiscount(null);
-        System.assertEquals(0, nullAmount);
+        // 15% discount (>200 <500)
+        Decimal discount15 = DiscountCalculator.calculateDiscount(300, null);
+        System.assertEquals(255, discount15);
+
+        // 20% discount (>=500)
+        Decimal discount20 = DiscountCalculator.calculateDiscount(500, null);
+        System.assertEquals(400, discount20);
+
+        // Additional 5% code
+        Decimal extraCodeDiscount = DiscountCalculator.calculateDiscount(200, 'OSF5');
+        System.assertEquals(171, extraCodeDiscount);
+
+        // Null amount
+        Decimal nullAmount = DiscountCalculator.calculateDiscount(null, null);
+        System.assertEquals(null, nullAmount);
     }
 }
