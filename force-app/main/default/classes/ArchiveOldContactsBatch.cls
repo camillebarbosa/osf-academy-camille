@@ -8,11 +8,10 @@
 public with sharing class ArchiveOldContactsBatch implements Database.Batchable<sObject> {
 
     public Database.QueryLocator start(Database.BatchableContext bc) {
-        // Usamos Date.today() para facilitar a comparação no teste
+        
         Date sixMonthsAgo = Date.today().addMonths(-6);
         
-        // Importante: No SOQL, comparamos com a data de sistema.
-        // Se o teste falhar, podemos usar CreatedDate para cobrir o cenário do Test.setCreatedDate
+        
         return Database.getQueryLocator([
             SELECT Id, Is_Archived__c 
             FROM Contact 
