@@ -1,25 +1,27 @@
-# SFDC Exercise
+# Pre-Requisites
 
 # Scenario
-A company wants to ensure that whenever an Account record is created or updated, the billing address is verified against an external address verification service. For the purpose of this exercise, we will simulate the verification by checking if the Billing Postal Code is in either one of 2 specific country formats: Romanian or Brazilian
+A company wants to ensure that discounts are automatically applied to Opportunities based on their sales stage. This helps in maintaining consistent pricing strategies throughout the sales process. The discount rates vary depending on the stage of the Opportunity.
 
 # Requirements
-- Create a trigger on the Account object.
-- The trigger should fire before insert and before update events.
-- If the Billing Postal Code is not in the correct format, add an error to the record preventing the operation.
-- Assume the external service verification is a simple method that checks the format of the postal code (you can mock this).
-- Extra: use regular expressions to validate the postal codes
+- Create a trigger on the Opportunity object.
+- The trigger should fire before the insert event.
+- Apply discounts based on the Opportunity's stage:
+    - Prospecting: 5% discount
+    - Qualification: 10% discount
+    - Negotiation/Review: 15% discount
+    - Other Stages: No discount
+- Implement the discount logic in a separate Apex class for better maintainability.
 
 # Instructions
-- Create an Apex class named AccountAddressVerificationTest.cls and paste the contents of the AccountAddressVerificationTest.cls from this repo in it.
+- **Create an Apex Class**:
+    - Name it OpportunityDiscountAssigner.
+    - Implement a method to apply discounts based on the Opportunity stage.
 
-- Create a new Apex class named AddressVerificationService. This class should have a single method named **isPostalCodeValid**.
+- **Create an Apex Trigger**:
+    - Name it OpportunityTrigger.
+    - The trigger should invoke the discount logic from the OpportunityDiscountAssigner class before inserting an Opportunity.
 
-- Create a new Apex trigger named AccountAddressVerification which should invoke your AddressVerificationService class method.
-
-- Deploy the code to your Org
-
-- Using Visual Studio Code Testing Tab, run all tests
-
-# Minimum Test Coverage: 100%
-The test class AccountAddressVerificationTest.cls contains 100% test coverage if your solution is correctly implemented. You should try to achieve the 100% coverage.
+- **Testing**:
+    - Use the provided test class OpportunityDiscountAssignerTest to ensure all scenarios are covered.
+    - Achieve a minimum test coverage of 100% by running all tests using the Salesforce Developer Console or Visual Studio Code.
