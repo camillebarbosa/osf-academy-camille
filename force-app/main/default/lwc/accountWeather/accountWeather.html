@@ -1,0 +1,62 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 03-22-2026
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<template>
+  <div class="container">
+    <template if:true={weather}>
+      <div class="background">
+        <template if:true={isRain}><div class="rain"></div></template>
+        <template if:true={isSnow}><div class="snow"></div></template>
+        <template if:true={isSunny}><div class="sun"></div></template>
+        <template if:true={isCloudy}><div class="clouds"></div></template>
+      </div>
+
+      <div class={cardClass}>
+        <div class="header">
+          <img src={weatherIcon} class="icon" alt="Weather Icon" />
+          <div class="temp">{temperature}°F</div>
+          <div class="description">{description}</div>
+        </div>
+
+        <div class="details">
+          <div class="row">
+            <span>Feels like</span><span>{feelsLike}°F</span>
+          </div>
+          <div class="row"><span>Humidity</span><span>{humidity}%</span></div>
+          <div class="row"><span>Wind</span><span>{wind} km/h</span></div>
+        </div>
+      </div>
+    </template>
+
+    <template if:true={error}>
+      <div
+        class="card slds-theme_error slds-theme_alert-texture"
+        style="background: white; color: #742021; text-align: center"
+      >
+        <lightning-icon
+          icon-name="utility:error"
+          alternative-text="Error"
+          variant="error"
+          size="large"
+        ></lightning-icon>
+        <div class="slds-m-top_medium">
+          <p class="slds-text-heading_small">Ops! Algo deu errado.</p>
+          <p>{errorMessage}</p>
+        </div>
+      </div>
+    </template>
+
+    <template if:false={weather}>
+      <template if:false={error}>
+        <lightning-spinner
+          alternative-text="Loading"
+          size="medium"
+        ></lightning-spinner>
+      </template>
+    </template>
+  </div>
+</template>

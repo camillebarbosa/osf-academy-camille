@@ -25,5 +25,3 @@ A company wants to ensure that discounts are automatically applied to Opportunit
 - **Testing**:
     - Use the provided test class OpportunityDiscountAssignerTest to ensure all scenarios are covered.
     - Achieve a minimum test coverage of 100% by running all tests using the Salesforce Developer Console or Visual Studio Code.
-
-By following these instructions, you will ensure that the Opportunity records in your Salesforce Org are automatically adjusted with the correct discounts based on their sales stage, maintaining consistency and accuracy in pricing strategies.
