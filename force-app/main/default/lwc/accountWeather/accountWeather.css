@@ -1,0 +1,157 @@
+.container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background: transparent;
+  overflow: hidden;
+}
+
+/* 🌌 BACKGROUND CENÁRIO */
+.background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* ☀️ SOL */
+.sun {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, #ffd54f, #ff8f00);
+  border-radius: 50%;
+  top: 10%;
+  right: 10%;
+  animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+/* 🌧️ CHUVA */
+.rain::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(
+    transparent 90%,
+    rgba(255, 255, 255, 0.4) 100%
+  );
+  background-size: 2px 20px;
+  animation: rainFall 0.5s linear infinite;
+}
+
+@keyframes rainFall {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 20px;
+  }
+}
+
+/* ❄️ NEVE */
+.snow::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(white 2px, transparent 2px);
+  background-size: 20px 20px;
+  animation: snowFall 6s linear infinite;
+}
+
+@keyframes snowFall {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 200px;
+  }
+}
+
+/* ☁️ NUVENS */
+.clouds {
+  position: absolute;
+  width: 200%;
+  height: 100%;
+  background: url("https://i.imgur.com/3sKQZ5E.png") repeat-x;
+  opacity: 0.3;
+  animation: moveClouds 30s linear infinite;
+}
+
+@keyframes moveClouds {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* 🎴 CARD */
+.card {
+  width: 280px;
+  border-radius: 20px;
+  padding: 20px;
+  color: white;
+  z-index: 1;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* temas */
+.hot {
+  background: linear-gradient(180deg, #f7971e, #ffd200);
+}
+
+.rainCard {
+  background: linear-gradient(180deg, #3a7bd5, #3a6073);
+}
+
+.cold {
+  background: linear-gradient(180deg, #00c6ff, #0072ff);
+}
+
+.cloudyCard {
+  background: linear-gradient(180deg, #757f9a, #d7dde8);
+  color: #2c2c2c;
+}
+
+/* conteúdo */
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.icon {
+  width: 70px;
+}
+
+.temp {
+  font-size: 48px;
+  font-weight: bold;
+}
+
+.description {
+  font-size: 16px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0;
+}

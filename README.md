@@ -1,15 +1,25 @@
 # SFDC Exercise
 
-# Pre-Requisites
-Create an empty SFDX project on Visual Studio Code and make sure you are connected to a trailhead playground
+# Scenario
+A company wants to ensure that whenever an Account record is created or updated, the billing address is verified against an external address verification service. For the purpose of this exercise, we will simulate the verification by checking if the Billing Postal Code is in either one of 2 specific country formats: Romanian or Brazilian
+
+# Requirements
+- Create a trigger on the Account object.
+- The trigger should fire before insert and before update events.
+- If the Billing Postal Code is not in the correct format, add an error to the record preventing the operation.
+- Assume the external service verification is a simple method that checks the format of the postal code (you can mock this).
+- Extra: use regular expressions to validate the postal codes
 
 # Instructions
-1 - Using the SFDX extension...
+- Create an Apex class named AccountAddressVerificationTest.cls and paste the contents of the AccountAddressVerificationTest.cls from this repo in it.
 
-2 - Deploy the code to your Org
+- Create a new Apex class named AddressVerificationService. This class should have a single method named **isPostalCodeValid**.
 
-3 - Using Visual Studio Code Testing Tab, run all tests
-![Testing Tab](https://res.cloudinary.com/di6irk93t/image/upload/v1719759634/sfdc/run_apex_classes_vs_code_icehfo.png)
+- Create a new Apex trigger named AccountAddressVerification which should invoke your AddressVerificationService class method.
+
+- Deploy the code to your Org
+
+- Using Visual Studio Code Testing Tab, run all tests
 
 # Minimum Test Coverage: 100%
-Salesforce has a minimum test coverage requirement of 75% when you want to deploy code to your org for testing or production. But 75% is the bare minimum and you should get used to try to get as close to 100% as possible with the help of AllAi
+The test class AccountAddressVerificationTest.cls contains 100% test coverage if your solution is correctly implemented. You should try to achieve the 100% coverage.
